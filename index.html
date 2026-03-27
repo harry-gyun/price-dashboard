@@ -368,16 +368,34 @@ function uLeg(){
     return`<span class="tag" style="background:${CB[i]};color:${CC[i]}"><span class="tag-dot" style="background:${CC[i]}"></span>${CN[i]}<span style="margin-left:4px;opacity:.7;font-weight:400">${p?W(p):'-'}</span></span>`;
   }).join('');
 }
-function uLine(){
+function uLine(rate){
   const o=gO(),qs=gQS();
+  const r=rate!=null?rate:+document.getElementById('rsl').value;
   lc.data.labels=qs.map(q=>''+q);
-  lc.data.datasets=CK.map((k,i)=>{
+  const base=CK.map((k,i)=>{
     if(!o[k])return null;
     return{label:CN[i],data:o[k],borderColor:CC[i],backgroundColor:'transparent',
       borderWidth:k==='op'?3:1.8,pointRadius:0,tension:0.25,spanGaps:true,
       borderDash:k==='op'?[]:[4,3]};
   }).filter(Boolean);
-  lc.update();
+  if(r>0){
+    const adjusted=o.op.map(v=>v!=null?Math.round(v*(1+r/100)):null);
+    base.push({
+      label:`오프린트미 +${r}% 적용`,
+      data:adjusted,
+      borderColor:'#ffca4f',
+      backgroundColor:'rgba(255,202,79,0.12)',
+      borderWidth:2.5,
+      pointRadius:0,
+      tension:0.25,
+      spanGaps:true,
+      borderDash:[6,3],
+      fill:false,
+      order:-1
+    });
+  }
+  lc.data.datasets=base;
+  lc.update('none');
 }
 function uBar(){
   const o=gO(),lb=[],vl=[],cl=[];
@@ -415,6 +433,7 @@ function uS(){
     const nd=np-cp,pos=nd<=0;
     return`<div class="cmp-row"><span style="color:var(--color-text-secondary)">${CN[i+1]}</span><span style="font-weight:500;color:${pos?'#27500A':'#A32D2D'}">${pos?`여전히 ${W(Math.abs(nd))} 저렴`:`${W(Math.abs(nd))} 비쌈`}</span></div>`;
   }).join(''):'';
+  uLine(r);
 }
 
 function uIhead(){
