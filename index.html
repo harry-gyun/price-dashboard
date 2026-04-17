@@ -3,630 +3,206 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>판매가 분석 대시보드</title>
+<title>오프린트미 클리어런스 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{--color-background-primary:#fff;--color-background-secondary:#f5f5f4;--color-text-primary:#18181b;--color-text-secondary:#71717a;--color-border-tertiary:rgba(0,0,0,.10);--color-border-secondary:rgba(0,0,0,.18);--font-sans:system-ui,-apple-system,sans-serif}
-@media(prefers-color-scheme:dark){:root{--color-background-primary:#1c1c1e;--color-background-secondary:#2c2c2e;--color-text-primary:#f5f5f5;--color-text-secondary:#a1a1aa;--color-border-tertiary:rgba(255,255,255,.10);--color-border-secondary:rgba(255,255,255,.18)}}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);color:var(--color-text-primary);font-size:13px;background:var(--color-background-secondary)}
-.pnav{display:flex;gap:2px;padding:0 20px;background:var(--color-background-primary);border-bottom:1px solid var(--color-border-secondary);overflow-x:auto}
-.pn{padding:14px 18px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;font-family:inherit;letter-spacing:.02em;transition:color .15s}
-.pn:hover{color:var(--color-text-primary)}.pn.on{color:var(--color-text-primary);border-bottom-color:#18181b;font-weight:500}
-.vtabs{display:flex;gap:4px;padding:16px 20px 0;background:var(--color-background-primary)}
-.vt{padding:9px 18px;font-size:12px;border-radius:6px 6px 0 0;border:1px solid transparent;border-bottom:none;cursor:pointer;background:transparent;color:var(--color-text-secondary);font-family:inherit;transition:all .15s}
-.vt:hover{background:var(--color-background-secondary)}.vt.on{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500;border-color:var(--color-border-secondary)}
-.content{padding:20px}
-.card{background:var(--color-background-primary);border-radius:10px;border:1px solid var(--color-border-tertiary);padding:20px;margin-bottom:16px}
-.card-title{font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--color-text-secondary);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::before{content:'';display:block;width:3px;height:14px;border-radius:2px;background:#18181b;flex-shrink:0}
-.lbl{font-size:11px;color:var(--color-text-secondary);letter-spacing:.04em;display:block;margin-bottom:5px}
-select,input[type=number]{padding:8px 10px;border:1px solid var(--color-border-secondary);border-radius:6px;font-size:12px;color:var(--color-text-primary);background:var(--color-background-primary);font-family:inherit;width:100%}
-input[type=range]{width:100%;accent-color:#18181b;margin:6px 0}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
-.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
-.stat{background:var(--color-background-secondary);border-radius:8px;padding:14px 16px;border:1px solid var(--color-border-tertiary)}
-.stat-l{font-size:11px;color:var(--color-text-secondary);margin-bottom:5px;letter-spacing:.03em}
-.stat-v{font-size:20px;font-weight:500;letter-spacing:-.03em;line-height:1}
-.stat-v.blu{color:#185FA5}.stat-v.grn{color:#27500A}.stat-v.red{color:#A32D2D}
-.divider{height:1px;background:var(--color-border-tertiary);margin:16px 0}
-.cmp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--color-border-tertiary);font-size:12px}
-.cmp-row:last-child{border:none}
-.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
-.tag-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.sl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.sl-row .lbl{margin:0;flex-shrink:0;min-width:40px}
-.sl-val{font-size:12px;font-weight:500;min-width:30px;text-align:right;flex-shrink:0}
-.badge{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;text-align:center}
-.badge.pos{background:#EAF3DE;color:#27500A}.badge.neg{background:#FCEBEB;color:#A32D2D}.badge.neu{background:var(--color-background-secondary);color:var(--color-text-secondary)}
-.tbl-wrap{overflow:auto;border-radius:8px;border:1px solid var(--color-border-secondary)}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:580px}
-thead th{padding:10px 12px;font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--color-text-secondary);background:var(--color-background-secondary);border-bottom:1px solid var(--color-border-secondary);text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
-thead th:first-child{text-align:left}
-td{padding:9px 12px;border-bottom:1px solid var(--color-border-tertiary);text-align:right;color:var(--color-text-primary)}
-td:first-child{text-align:left;color:var(--color-text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--color-background-secondary)}
-tfoot td{padding:10px 12px;font-weight:500;background:var(--color-background-secondary);border-top:1px solid var(--color-border-secondary);text-align:right}
-tfoot td:first-child{text-align:left}
-.vi{width:60px;padding:4px 6px;border:1px solid var(--color-border-secondary);border-radius:4px;font-size:12px;text-align:right;background:var(--color-background-primary);color:var(--color-text-primary);font-family:inherit}
-.q-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.q-row input[type=number]{width:90px;padding:6px 8px}
-.btn{padding:7px 12px;font-size:11px;border:1px solid var(--color-border-secondary);background:var(--color-background-primary);border-radius:6px;cursor:pointer;color:var(--color-text-secondary);font-family:inherit;white-space:nowrap;transition:all .12s}
-.btn:hover{background:#18181b;color:#fff;border-color:#18181b}
-.rec-hero{border-radius:10px;padding:24px;margin-bottom:16px;color:#fff}
-.pos-bar{height:8px;background:#E5E5E5;border-radius:4px;overflow:hidden;margin:8px 0}
-.pos-fill{height:100%;border-radius:4px;background:#18181b;transition:width .4s}
-.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.rec-card{background:var(--color-background-primary);border-radius:10px;border:1px solid var(--color-border-tertiary);padding:18px}
-.rec-card.accent{border-color:#18181b;border-width:2px}
-.insight-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border-tertiary)}
-.insight-item:last-child{border:none}
-.insight-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.rank-pill{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:500}
-.excl-btn{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}
-@media(max-width:580px){.two,.rec-grid,.four,.three{grid-template-columns:1fr}}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f6f5f1;--surface:#fff;--surface2:#f0efeb;--text:#1a1a18;--text2:#6b6a65;--text3:#9c9b96;--border:#e5e4df;--border2:#d1d0cb;--coral:#d85a30;--coral-bg:#faece7;--coral-text:#993c1d;--teal:#1d9e75;--teal-bg:#e1f5ee;--teal-text:#0f6e56;--blue:#378add;--blue-bg:#e6f1fb;--blue-text:#0c447c;--amber:#ba7517;--amber-bg:#faeeda;--amber-text:#633806;--red:#e24b4a;--red-bg:#fcebeb;--purple:#534ab7;--purple-bg:#eeedfe;--purple-text:#3c3489;--radius:10px;--radius-lg:14px}
+@media(prefers-color-scheme:dark){:root{--bg:#141413;--surface:#1e1e1c;--surface2:#282826;--text:#e8e7e3;--text2:#9c9b96;--text3:#6b6a65;--border:#333330;--border2:#444441;--coral:#f0997b;--coral-bg:#4a1b0c;--coral-text:#f5c4b3;--teal:#5dcaa5;--teal-bg:#04342c;--teal-text:#9fe1cb;--blue:#85b7eb;--blue-bg:#042c53;--blue-text:#b5d4f4;--amber:#fac775;--amber-bg:#412402;--amber-text:#faeeda;--red:#f09595;--red-bg:#501313;--purple:#afa9ec;--purple-bg:#26215c;--purple-text:#cecbf6}}
+body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem 4rem}
+header{margin-bottom:1.5rem}
+header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em}
+header p{font-size:0.8rem;color:var(--text2);margin-top:4px}
+.tabs{display:flex;gap:4px;margin-bottom:2rem;border-bottom:2px solid var(--border)}
+.tab{font-family:inherit;font-size:0.82rem;font-weight:500;padding:10px 20px;border:none;background:none;color:var(--text3);cursor:pointer;position:relative;transition:color .15s}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--text)}
+.tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--text)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.badge{display:inline-block;font-size:0.65rem;font-weight:600;padding:2px 8px;border-radius:6px;vertical-align:middle;margin-left:6px}
+.badge-coral{background:var(--coral-bg);color:var(--coral-text)}.badge-teal{background:var(--teal-bg);color:var(--teal-text)}.badge-blue{background:var(--blue-bg);color:var(--blue-text)}.badge-new{background:var(--blue-bg);color:var(--blue-text)}.badge-soldout{background:var(--surface2);color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}.badge-purple{background:var(--purple-bg);color:var(--purple-text)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:2rem}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem}
+.metric-label{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;font-weight:500}
+.metric-value{font-size:1.5rem;font-weight:700;margin-top:2px;letter-spacing:-0.02em}
+.metric-sub{font-size:0.7rem;color:var(--text2);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+.card-title{font-size:0.85rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.card-title .dot{width:8px;height:8px;border-radius:50%}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+.filters button{font-family:inherit;font-size:0.7rem;padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s}
+.filters button:hover{border-color:var(--border2);color:var(--text)}
+.filters button.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chart-wrap{position:relative;width:100%}
+table{width:100%;border-collapse:collapse;font-size:0.75rem}
+thead th{text-align:left;padding:10px 8px;color:var(--text3);font-weight:500;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+thead th.r{text-align:right}thead th.c{text-align:center}
+tbody td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody td.r{text-align:right;font-variant-numeric:tabular-nums}tbody td.c{text-align:center}
+tbody tr:hover{background:var(--surface2)}tbody tr.soldout{opacity:0.55}
+tfoot td{padding:10px 8px;font-weight:600;border-top:2px solid var(--border2)}tfoot td.r{text-align:right;font-variant-numeric:tabular-nums}
+.bar-cell{display:flex;align-items:center;gap:6px}.bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}.bar-fill{height:100%;border-radius:3px;transition:width .4s}.bar-label{font-size:0.7rem;min-width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.product-name{font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:0.7rem;color:var(--text2);margin-bottom:12px}.legend span{display:flex;align-items:center;gap:4px}.legend .swatch{width:10px;height:10px;border-radius:2px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+.fade-in{opacity:0;transform:translateY(12px);animation:fadeUp .5s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.insight{font-size:0.82rem;line-height:1.8;color:var(--text)}
+.insight h3{font-size:0.9rem;font-weight:600;margin:1.5rem 0 0.5rem;display:flex;align-items:center;gap:6px}
+.insight h3:first-child{margin-top:0}
+.insight p{margin-bottom:0.6rem}
+.insight .hl{background:var(--amber-bg);color:var(--amber-text);padding:1px 6px;border-radius:4px;font-weight:500;font-size:0.78rem}
+.insight .num{font-weight:600;font-variant-numeric:tabular-nums}
+.scenario{border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.75rem}
+.scenario.rec{border-color:var(--teal);border-width:2px;background:var(--teal-bg)}
+.scenario-header{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem}
+.scenario-label{font-size:0.75rem;font-weight:600}
+.scenario p{font-size:0.78rem;color:var(--text2);margin:0}.scenario.rec p{color:var(--teal-text)}
+.timeline{display:flex;gap:12px;margin-top:1rem;flex-wrap:wrap}
+.tl-item{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem 1rem;text-align:center}
+.tl-item .month{font-size:0.7rem;color:var(--text3);font-weight:500;text-transform:uppercase}
+.tl-item .event{font-size:0.78rem;font-weight:500;margin-top:4px}
+.tl-item .est{font-size:0.68rem;color:var(--text2);margin-top:2px}
 </style>
 </head>
 <body>
-<nav class="pnav" id="pnav"></nav>
+<div class="wrap">
+  <header class="fade-in"><h1>오프린트미 클리어런스 대시보드</h1><p>2026-02-02 ~ 2026-04-15 · KOR · 팀블링 어패럴</p></header>
+  <div class="tabs fade-in" style="animation-delay:.03s">
+    <button class="tab active" data-tab="sales">판매 현황</button>
+    <button class="tab" data-tab="analysis">분석 &amp; 예측</button>
+    <button class="tab" data-tab="strategy">전략 제안</button>
+  </div>
 
-<div id="optbar" style="background:var(--color-background-primary);padding:0 20px 16px;border-bottom:1px solid var(--color-border-secondary)">
-  <div style="padding-top:16px">
-    <span class="lbl">옵션 선택</span>
-    <select id="osel" onchange="sO(+this.value)"></select>
+  <!-- TAB 1 -->
+  <div id="tab-sales" class="tab-panel active">
+    <div class="metrics fade-in" style="animation-delay:.05s" id="metrics"></div>
+    <div class="card fade-in" style="animation-delay:.1s"><div class="card-title"><span class="dot" style="background:var(--teal)"></span>판매 현황 테이블</div><div style="overflow-x:auto"><table><thead><tr><th style="width:30px">#</th><th>상품명</th><th class="c">0원 이벤트</th><th class="r">재고 (2/2)</th><th class="r">판매수량</th><th class="r">잔여재고 (실)</th><th style="width:160px">소진율</th><th class="r">매출 (VAT제외)</th><th class="c">비고</th></tr></thead><tbody id="tableBody"></tbody><tfoot id="tableFoot"></tfoot></table></div></div>
+    <div class="grid-2">
+      <div class="card fade-in" style="animation-delay:.15s"><div class="card-title"><span class="dot" style="background:var(--blue)"></span>주간 판매 추이</div><div class="filters" id="trendFilters"><button class="active" data-f="all">전체</button><button data-f="event">0원 이벤트</button><button data-f="non">비이벤트</button></div><div class="chart-wrap" style="height:360px"><canvas id="trendChart"></canvas></div></div>
+      <div class="card fade-in" style="animation-delay:.2s"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>주간 구성비</div><div class="legend" id="stackLegend"></div><div class="chart-wrap" style="height:360px"><canvas id="stackChart"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card fade-in" style="animation-delay:.25s"><div class="card-title"><span class="dot" style="background:var(--amber)"></span>재고 소진 현황</div><div class="chart-wrap" style="height:400px"><canvas id="invChart"></canvas></div></div>
+      <div class="card fade-in" style="animation-delay:.3s"><div class="card-title"><span class="dot" style="background:var(--purple)"></span>매출 비중</div><div class="chart-wrap" style="height:400px"><canvas id="pieChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="tab-analysis" class="tab-panel">
+    <div class="metrics" id="aMetrics"></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--blue)"></span>전체 어패럴 vs 클리어런스 (주간)</div><div class="chart-wrap" style="height:340px"><canvas id="a1"></canvas></div></div>
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>클리어런스 비중 변화</div><div class="chart-wrap" style="height:340px"><canvas id="a2"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-title"><span class="dot" style="background:var(--teal)"></span>향후 8주 판매량 예측</div><div class="chart-wrap" style="height:360px"><canvas id="a3"></canvas></div></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--amber)"></span>전년 동기 비교 (YoY)</div><div class="chart-wrap" style="height:340px"><canvas id="a4"></canvas></div></div>
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--purple)"></span>핵심 인사이트</div><div class="insight">
+        <h3>0원 이벤트의 압도적 집중력</h3><p>0원 이벤트 2주간 약 <span class="hl">28,000개</span> 소진 vs 이후 상시 할인 3주간 약 860개. 이벤트 집중 방식이 <span class="num">33배</span> 더 효율적입니다.</p>
+        <h3>비클리어런스 후광 효과</h3><p>이벤트 기간 비클리어런스 어패럴 평시 대비 <span class="num">+30%</span> 판매 증가. 이벤트 직후 4/6 주차에 전 기간 최고치 <span class="num">1,773개</span>를 달성했습니다.</p>
+        <h3>현 속도로는 재고 해소 불가</h3><p>실 잔여 재고 <span class="num">42,256개</span>, 주당 ~280개 소진 시 완전 소진까지 약 <span class="hl">2.9년</span>. 전략 전환이 필요합니다.</p>
+        <h3>전년 대비 어패럴 성장세</h3><p>비클리어런스 기준 2026년 주간 판매량은 전년 동기 대비 약 <span class="num">15%</span> 성장 중. 4~6월 성수기 진입 시 추가 상승 예상됩니다.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="tab-strategy" class="tab-panel">
+    <div class="card"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>시나리오 비교</div>
+      <div class="scenario"><div class="scenario-header"><span class="badge badge-coral">A</span><span class="scenario-label">현행 유지 — 50% 할인 상시 운영</span></div><p>주당 ~280개 소진 · 연간 ~14,500개 · 완전 소진 약 2.9년. 낮은 단가로 수익성 제한, 상시 할인에 의한 브랜드 가치 희석 리스크.</p></div>
+      <div class="scenario rec"><div class="scenario-header"><span class="badge badge-teal">B</span><span class="scenario-label">추천 — 일시 OFF → 분기별 이벤트 집중</span><span class="badge badge-teal" style="margin-left:auto">RECOMMENDED</span></div><p>0원 이벤트 2주간 ~28,000개 소진 실적 증명. 분기 1회(2주) × 연 3회 = 연간 40,000~50,000개 소진 가능. 비이벤트 기간 일반 어패럴 판매 집중, 이벤트 시 비클리어런스 동반 상승(+30%) 효과.</p></div>
+      <div class="scenario"><div class="scenario-header"><span class="badge badge-purple">C</span><span class="scenario-label">단계적 할인 확대 — 60% → 70%</span></div><p>할인율 인상으로 소진 속도 가속. 기존 50% 구매자 불만 및 가격 기대치 하락 우려.</p></div>
+    </div>
+    <div class="card"><div class="card-title"><span class="dot" style="background:var(--teal)"></span>시나리오 B — 실행 로드맵</div>
+      <div class="insight"><p>신규 8개 품목(<span class="num">9,836개</span>) 합류 시 이벤트 물량을 풍성하게 구성할 수 있어 고객 유입 효과가 극대화됩니다.</p></div>
+      <div class="timeline">
+        <div class="tl-item" style="border-color:var(--teal)"><div class="month">2026년 5월</div><div class="event">가정의 달 이벤트</div><div class="est">예상 소진: ~12,000개</div></div>
+        <div class="tl-item" style="border-color:var(--blue)"><div class="month">2026년 7~8월</div><div class="event">여름 시즌 이벤트</div><div class="est">예상 소진: ~15,000개</div></div>
+        <div class="tl-item" style="border-color:var(--amber)"><div class="month">2026년 10~11월</div><div class="event">블프/연말 이벤트</div><div class="est">예상 소진: ~15,000개</div></div>
+        <div class="tl-item" style="border-color:var(--coral)"><div class="month">2027년 Q1</div><div class="event">잔여 재고 정리</div><div class="est">잔여분 최종 클리어</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--blue)"></span>시나리오별 재고 소진 예측</div><div class="chart-wrap" style="height:360px"><canvas id="s1"></canvas></div></div>
+      <div class="card"><div class="card-title"><span class="dot" style="background:var(--amber)"></span>시나리오별 연간 소진량 비교</div><div class="chart-wrap" style="height:360px"><canvas id="s2"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-title"><span class="dot" style="background:var(--purple)"></span>최종 의견</div><div class="insight">
+      <h3>시나리오 B를 추천하는 3가지 근거</h3>
+      <p><strong>1. 이벤트 집중 소진력:</strong> 상시 할인 대비 <span class="hl">33배</span> 효율적. 0원 이벤트 2주로 28,000개 소진한 실적이 이를 증명합니다.</p>
+      <p><strong>2. 후광 효과:</strong> 이벤트 기간 비클리어런스 어패럴 판매 <span class="num">+30%</span> 동반 상승. 전체 어패럴 매출 성장에도 기여합니다.</p>
+      <p><strong>3. 신규 물량 활용:</strong> 신규 8개 품목(9,836개) 합류로 이벤트 구색 강화 가능. 분기별 3회 이벤트로 <span class="hl">연내 대부분 재고 해소</span> 전망입니다.</p>
+    </div></div>
   </div>
 </div>
 
-<div class="vtabs" id="vtabs">
-  <button class="vt on" id="vt0" onclick="sv(0)">옵션별 분석</button>
-  <button class="vt" id="vt1" onclick="sv(1)">통합 시뮬레이션</button>
-  <button class="vt" id="vt2" onclick="sv(2)">추천 판매가</button>
-</div>
-
-<div class="content" id="vd0">
-  <div class="card">
-    <div class="card-title">수량별 단가 비교</div>
-    <div class="legend-row" id="leg"></div>
-    <div style="position:relative;height:220px"><canvas id="lc"></canvas></div>
-  </div>
-  <div class="two">
-    <div class="card">
-      <div class="card-title">업체별 가격 비교</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span class="lbl" style="margin:0;white-space:nowrap">기준 수량</span>
-        <select id="qsel" onchange="sQ(+this.value)" style="width:auto;flex:1;font-size:12px;padding:6px 8px"></select>
-      </div>
-      <div style="position:relative;height:175px"><canvas id="bc"></canvas></div>
-      <div class="divider"></div>
-      <div id="diff"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">가격 인상 시뮬레이터</div>
-      <div class="sl-row">
-        <span class="lbl">인상률</span>
-        <input type="range" id="rsl" min="0" max="50" step="1" value="5" oninput="uS()">
-        <span class="sl-val" id="rdisp">5%</span>
-      </div>
-      <div style="margin-bottom:14px">
-        <span class="lbl">월 예상 판매 수량</span>
-        <input type="number" id="vinp" value="500" min="1" oninput="uS()">
-      </div>
-      <div class="four" id="smets" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px"></div>
-      <div id="sbadge"></div>
-      <div id="scmp" style="margin-top:8px"></div>
-    </div>
-  </div>
-</div>
-
-<div class="content" id="vd1" style="display:none">
-  <div class="card" style="padding:16px 20px">
-    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
-      <div style="min-width:120px">
-        <span class="lbl">기준 수량</span>
-        <select id="iqsel" onchange="uI()" style="font-size:12px;padding:7px 8px;width:auto"></select>
-      </div>
-      <div style="flex:1;min-width:180px">
-        <div class="sl-row" style="margin-bottom:0">
-          <span class="lbl">인상률</span>
-          <input type="range" id="irl" min="0" max="50" step="1" value="5" oninput="uI()">
-          <span class="sl-val" id="irdisp">5%</span>
-        </div>
-      </div>
-      <div>
-        <span class="lbl">전체 수량 일괄 적용</span>
-        <div class="q-row">
-          <input type="number" id="qall" placeholder="직접 입력" min="0" style="width:90px">
-          <button class="btn" onclick="applyAll()">적용</button>
-          <button class="btn" onclick="sAV(100)">100개</button>
-          <button class="btn" onclick="sAV(500)">500개</button>
-          <button class="btn" onclick="sAV(0)">초기화</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="three" id="isum"></div>
-  <div class="tbl-wrap">
-    <table>
-      <thead id="ith"></thead>
-      <tbody id="itb"></tbody>
-      <tfoot id="itf"></tfoot>
-    </table>
-  </div>
-</div>
-
-<div class="content" id="vd2" style="display:none">
-  <div class="rec-hero" id="rhero"></div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title">경쟁사 포함/제외 설정</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="excl-btns"></div>
-    <div style="font-size:11px;color:var(--color-text-secondary)">비정상적으로 높거나 낮은 가격의 업체를 제외하면 더 정확한 시장 평균 기준으로 분석됩니다.</div>
-  </div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title">인상률 직접 조정</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div class="sl-row" style="flex:1;margin:0">
-        <span class="lbl">인상률</span>
-        <input type="range" id="rrl" min="-20" max="50" step="1" value="0" oninput="uRecRate()">
-        <span class="sl-val" id="rrdisp">0%</span>
-      </div>
-      <button class="btn" onclick="setRecRate(0)">초기화</button>
-      <button class="btn" onclick="setRecRate(null)" style="background:#18181b;color:#fff;border-color:#18181b">추천값 적용</button>
-    </div>
-    <div class="four" id="rmets" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px"></div>
-    <div id="rbadge"></div>
-    <div id="rcmp" style="margin-top:8px"></div>
-  </div>
-  <div class="rec-grid">
-    <div class="rec-card accent">
-      <div class="card-title">현재 판매가 진단</div>
-      <div id="rdiag"></div>
-    </div>
-    <div class="rec-card">
-      <div class="card-title">추천 인상률 근거</div>
-      <div id="rreason"></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">변경 후 기대 효과</div>
-    <div class="three" id="reffect" style="margin-bottom:0"></div>
-  </div>
-  <div class="card" style="margin-top:16px">
-    <div class="card-title">옵션별 경쟁 포지션 분석</div>
-    <div class="tbl-wrap" style="border:none">
-      <table>
-        <thead><tr>
-          <th style="text-align:left">옵션</th>
-          <th>우리 단가</th><th>시장 최저가</th><th>시장 평균가</th><th>시장 최고가</th>
-          <th>우리 포지션</th><th>추천 인상률</th>
-        </tr></thead>
-        <tbody id="rpos"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const QS_DEF=[1,2,3,4,5,10,20,30,50,100,200,300,500,1000];
-const QS_CARD=[50,100,250,500,1000,1500,2000,3000,5000,10000];
-const PQS={'소프트명함':QS_CARD};
-const gQS=()=>PQS[prod]||QS_DEF;
+const isDk=matchMedia('(prefers-color-scheme:dark)').matches;
+const gc=isDk?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)',tc=isDk?'#9c9b96':'#6b6a65';
+const teal=isDk?'#5dcaa5':'#1d9e75',coral=isDk?'#f0997b':'#d85a30',blue=isDk?'#85b7eb':'#378add',gray=isDk?'#b4b2a9':'#888780',amber=isDk?'#fac775':'#ba7517',purple=isDk?'#afa9ec':'#534ab7';
+const fmt=n=>n.toLocaleString('ko-KR');
+const fmtWon=n=>{if(n===0)return'-';if(n>=1e8)return Math.floor(n/1e8)+'억 '+fmt(Math.round(n%1e8/1e4))+'만';return fmt(Math.round(n/1e4))+'만'};
+const kF=v=>v>=1000?Math.round(v/1000)+'k':v;
+const bOpts=(ex={})=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:tc,font:{size:11},usePointStyle:true,pointStyleWidth:10}},...ex},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:10},callback:kF}}}});
 
-const CN=['오프린트미','비즈하우스','와우프레스','레드프린팅','비즈프린트'];
-const CK=['op','biz','wow','red','bzp'];
-const CC=['#ffca4f','#4386f4','#d01679','#ed1b24','#34a853'];
-const CB=['#fffbe8','#eaf1fe','#fce8f4','#fde8e8','#e8f5e9'];
+/* TAB 1 DATA */
+const D=[{n:1,name:'팀블링 30수 오버핏 티셔츠',ev:'1차',stock:13585,sold:10631,rev:11901200,isNew:false,so:false,ar:1525},{n:2,name:'팀블링 20수 티셔츠 (남)',ev:'2차',stock:9223,sold:6798,rev:6768423,isNew:false,so:false,ar:2146},{n:3,name:'팀블링 20수 오버핏 티셔츠',ev:'1차',stock:6892,sold:6892,rev:5167546,isNew:false,so:true,ar:0},{n:4,name:'팀블링 20수 티셔츠 (여)',ev:'2차',stock:9260,sold:4808,rev:4603600,isNew:false,so:false,ar:4348},{n:5,name:'팀블링 30수 티셔츠',ev:'-',stock:2707,sold:1013,rev:767068,isNew:false,so:false,ar:1227},{n:6,name:'팀블링 20수 세미크롭 티셔츠',ev:'2차',stock:5941,sold:306,rev:302064,isNew:false,so:false,ar:5474},{n:7,name:'팀블링 루즈핏 쭈리 맨투맨',ev:'-',stock:4605,sold:276,rev:537909,isNew:false,so:false,ar:3357},{n:8,name:'팀블링 16수 릴렉스핏 티셔츠',ev:'-',stock:9910,sold:269,rev:363959,isNew:false,so:false,ar:9047},{n:9,name:'팀블링 릴렉스핏 헤비쭈리 후드',ev:'-',stock:3795,sold:101,rev:266068,isNew:false,so:false,ar:2891},{n:10,name:'팀블링 30수 세미크롭 티셔츠',ev:'-',stock:4404,sold:44,rev:53618,isNew:false,so:false,ar:2311},{n:11,name:'팀블링 릴렉스핏 원피스',ev:'-',stock:121,sold:7,rev:11195,isNew:false,so:false,ar:94},{n:12,name:'팀블링 베이직 버킷햇',ev:'-',stock:2204,sold:0,rev:0,isNew:true,so:false,ar:2204},{n:13,name:'팀블링 바스켓볼 티셔츠',ev:'-',stock:217,sold:0,rev:0,isNew:true,so:false,ar:217},{n:14,name:'팀블링 ??수 오버핏 티셔츠',ev:'-',stock:4239,sold:0,rev:0,isNew:true,so:false,ar:4239},{n:15,name:'팀블링 피그먼트 쭈리 맨투맨',ev:'-',stock:742,sold:0,rev:0,isNew:true,so:false,ar:742},{n:16,name:'팀블링 슬림핏 라운드 티셔츠',ev:'-',stock:835,sold:0,rev:0,isNew:true,so:false,ar:835},{n:17,name:'팀블링 기모 후드',ev:'-',stock:692,sold:0,rev:0,isNew:true,so:false,ar:692},{n:18,name:'챔피온 20수 릴렉스핏 티셔츠',ev:'-',stock:440,sold:0,rev:0,isNew:true,so:false,ar:440},{n:19,name:'팀블링 릴렉스핏 쭈리 맨투맨',ev:'-',stock:467,sold:0,rev:0,isNew:true,so:false,ar:467}];
+D.forEach(r=>{r.remain=r.ar;r.sellThru=r.stock>0?((r.stock-r.remain)/r.stock*100):0});
+const tS=D.reduce((s,r)=>s+r.stock,0),tSo=D.reduce((s,r)=>s+r.sold,0),tR=D.reduce((s,r)=>s+r.remain,0),tRv=D.reduce((s,r)=>s+r.rev,0);
+document.getElementById('metrics').innerHTML=[{l:'Total stock',v:fmt(tS),s:'2/2 기준'},{l:'Total sold',v:fmt(tSo),s:'DB 기준 (KOR)'},{l:'Actual remaining',v:fmt(tR),s:'최신 실재고'},{l:'Revenue',v:fmtWon(tRv),s:'VAT 제외'},{l:'Existing SKU',v:'11',s:'판매 중'},{l:'New SKU',v:'8',s:'클리어런스 예정'}].map(m=>`<div class="metric"><div class="metric-label">${m.l}</div><div class="metric-value">${m.v}</div><div class="metric-sub">${m.s}</div></div>`).join('');
 
-const D={
-'현수막':[
-{k:'5000×900 현수막천 기본',op:[12600,10450,9700,9250,8980,8800,8605,8507,8314,7825,7630,7336,7141,6848],biz:[14900,14400,13900,13400,10900,6900,6900,6900,6900,6900,6900,6900,6900,6900],wow:[13420,12155,10853,9598,8316,6391,6391,6391,6391,5623,5624,5112,5112,5112],red:[31020,28435,26657,23953,22682,22660,22660,22656,22656,22655,22655,22655,22655,22654],bzp:null},
-{k:'5000×900 텐트천 기본',op:[47700,44700,43233,42100,41480,40590,39695,39247,38344,36090,35189,33835,32933,31580],biz:null,wow:null,red:[47300,44660,42827,40123,38852,38841,38836,38837,38834,38833,38833,38833,38833,38833],bzp:null},
-{k:'4000×700 현수막천 기본',op:[10600,8400,7667,7225,6980,6840,6690,6617,6466,6086,5935,5706,5554,5326],biz:[12000,12000,12000,12000,11400,10800,10800,10800,10200,9600,9600,9600,9600,9600],wow:[11660,10450,9203,7975,6732,5401,5401,5397,5401,4910,4909,4418,4418,4419],red:[20240,19085,18223,17463,16676,14201,14196,14197,14197,14196,14195,14194,14194,14194],bzp:null},
-{k:'4000×700 텐트천 기본',op:[27500,25300,24333,23575,23220,22710,22210,21960,21454,20194,19690,18933,18428,17671],biz:null,wow:null,red:[30360,29150,28307,27555,26752,24277,24272,24270,24268,24267,24267,24266,24266,24266],bzp:null},
-{k:'2500×700 현수막천 기본',op:[7500,5600,4933,4550,4360,4260,4170,4123,4030,3793,3699,3556,3462,3320],biz:[12000,12000,12000,12000,11400,10800,10800,10800,10200,9600,9600,9600,9600,9600],wow:[9350,9405,9387,9405,9394,9394,9394,9394,9394,9394,9394,9394,9394,9394],red:[12870,12320,12063,11550,11550,9504,9004,9002,9000,9000,9000,9000,9000,9000],bzp:null},
-{k:'2500×700 텐트천 기본',op:[17200,15350,14600,14100,13820,13540,13245,13093,12796,12044,11744,11292,10991,10539],biz:null,wow:null,red:[19140,18590,18370,17875,17886,15818,15323,15327,15323,15323,15323,15323,15323,15323],bzp:null},
-{k:'5000×900 현수막천 금속링+로프',op:[15600,13300,12433,11825,11480,11170,10850,10673,10354,9697,9385,8979,8674,8108],biz:[14900,14400,13900,13400,10900,6900,6900,6900,6900,6900,6900,6900,6900,6900],wow:[16720,14630,13053,11660,10296,8206,8124,8096,8074,7290,7282,6768,6766,6764],red:[33000,30140,28270,25520,24222,24156,24134,24123,24116,24111,24109,24109,24109,24109],bzp:null},
-{k:'5000×900 텐트천 금속링+로프',op:[50700,47500,45967,44675,43960,42970,41940,41413,40384,37962,36944,35478,34466,32840],biz:[79900,77550,77500,77250,77000,74310,74310,74310,74310,74310,74310,74310,74310,74310],wow:null,red:[49280,46365,44440,41690,40392,40337,40310,40304,40295,40290,40290,40290,40290,40290],bzp:null},
-{k:'4000×700 현수막천 금속링+로프',op:[13600,11300,10367,9825,9460,9210,8935,8783,8506,7958,7690,7349,7087,6586],biz:[12000,12000,12000,12000,11400,10800,10800,10800,10200,9600,9600,9600,9600,9600],wow:[14960,12925,11403,10038,8712,7216,7134,7102,7084,6577,6568,6074,6072,6070],red:[22220,20790,19837,19030,18216,15697,15670,15664,15657,15657,15657,15657,15657,15657],bzp:null},
-{k:'4000×700 텐트천 금속링+로프',op:[30500,28100,27033,26200,25700,25090,24455,24127,23494,22066,21445,20575,19961,18931],biz:[60900,59100,59100,59075,59080,57860,57860,57860,57860,57860,57860,57860,57860,57860],wow:null,red:[32340,30855,29920,29123,28292,25773,25746,25736,25729,25729,25729,25729,25729,25729],bzp:null},
-{k:'2500×700 현수막천 금속링+로프',op:[10500,8400,7600,7150,6840,6640,6415,6290,6070,5665,5454,5199,4995,4580],biz:[12000,12000,12000,12000,11400,10800,10800,10800,10200,9600,9600,9600,9600,9600],wow:null,red:[14850,14025,13677,13118,13090,11000,10478,10468,10461,10457,10457,10457,10457,10457],bzp:null},
-{k:'2500×700 텐트천 금속링+로프',op:[20200,18150,17333,16700,16320,15920,15490,15260,14836,13916,13499,12935,12524,11799],biz:null,wow:null,red:[21120,20295,19983,19443,19426,17314,16797,16793,16784,16778,16778,16778,16778,16778],bzp:null},
-{k:'정사각 900×900 현수막천 기본',op:[4600,2900,2367,2050,1900,1870,1830,1807,1768,1665,1624,1562,1520,1458],biz:[12000,12000,12000,12000,11400,10800,10800,10800,10200,9600,9600,9600,9600,9600],wow:[7766,7766,7766,7766,7766,7766,7766,7766,7766,7766,7766,7766,7766,7766],red:[6930,6050,6050,5830,5830,5478,4659,4305,4301,4299,4299,4299,4299,4299],bzp:null},
-{k:'정사각 900×900 텐트천 기본',op:[9500,7850,7267,6900,6680,6560,6415,6347,6202,5838,5692,5473,5327,5109],biz:null,wow:null,red:[9790,9020,8983,8773,8756,8415,7590,7231,7229,7228,7228,7228,7228,7228],bzp:null},
-{k:'정사각 1200×1200 현수막천 기본',op:[6900,5050,4433,4100,3920,3850,3765,3723,3638,3424,3340,3211,3125,2997],biz:[12000,12000,12000,12000,11700,11400,11400,11400,11100,10800,10800,10800,10800,10800],wow:[10868,10923,10905,10896,10890,10901,10896,10897,10899,10898,10898,10898,10898,10898],red:[10560,10505,10120,9928,9504,8690,7420,7421,7418,7417,7417,7417,7417,7417],bzp:null},
-{k:'정사각 1200×1200 텐트천 기본',op:[13700,11700,11000,10550,10300,10080,9855,9747,9522,8963,8739,8403,8179,7843],biz:null,wow:null,red:[15840,15730,15290,15098,14674,13871,12601,12599,12597,12596,12596,12596,12596,12596],bzp:null}
-],
-'스탠다드 배너':[
-{k:'600×1800 PET X형',op:[26900,26600,26300,26000,26000,25500,25500,24900,24900,24600,24600,24300,24300,24200],biz:[26200,26200,26200,26200,26200,26200,26200,26200,26200,26200,26200,26200,26200,26200],wow:[17710,17655,17600,17545,17512,17281,16951,16614,15948,15535,15260,15204,15092,14969],red:[30140,30030,29847,29645,29502,29051,28138,28138,28134,28134,28134,28134,28134,28134],bzp:null},
-{k:'600×1800 PET Y형',op:[28900,28600,28300,28000,28000,27400,27400,26800,26800,26500,26500,26200,26200,26000],biz:[33800,33800,33800,33800,33800,33800,33800,33800,33800,33800,33800,33800,33800,33800],wow:[26070,25960,25923,25850,25828,25597,25295,24996,24394,23984,23835,23804,23744,23558],red:[40040,39930,39747,39545,39402,38951,38038,38038,38034,38034,38033,38033,38033,38033],bzp:null},
-{k:'600×1800 PET I형',op:[56900,56300,55700,55100,54000,52800,52800,51600,51600,51200,51200,50000,49400,48300],biz:[89900,89900,89900,89900,89900,89900,89900,89900,89900,89900,89900,89900,89900,89000],wow:null,red:null,bzp:null},
-{k:'600×1800 PET 유리접착고무',op:[11900,11700,11600,11500,11200,10900,10900,10700,10700,10700,10700,10400,10300,10000],biz:[9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700],wow:[10120,10010,9973,9900,9878,9779,9510,9240,8703,8423,7803,8339,8311,8254],red:[22000,20900,21047,20515,20174,19723,18810,18810,18806,18806,18806,18806,18805,18805],bzp:null},
-{k:'600×1800 PET 스탠드없음',op:[8900,8800,8700,8600,8400,8200,8200,8000,8000,8000,8000,7800,7700,7500],biz:[9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700,9700],wow:[9020,8910,8873,8800,8778,8679,8410,8140,7603,7873,7253,7239,7211,7154],red:[20020,19910,19727,19525,19382,18931,18018,18018,18014,18014,18013,18013,18013,18013],bzp:null},
-{k:'600×1800 메쉬 Y형',op:[32900,32500,32200,31800,31800,31200,31200,30500,30500,30100,30100,29800,29800,29600],biz:null,wow:[23540,22000,21487,21120,20746,20108,20053,19983,19853,19722,19515,19473,19390,19324],red:[33880,33715,33513,33303,33176,32736,31818,31819,31819,31818,31818,31817,31817,31817],bzp:null},
-{k:'600×1800 메쉬 유리접착고무',op:[14900,14700,14500,14400,14100,13700,13700,13400,13400,13400,13400,13000,12900,12600],biz:null,wow:[15950,14355,13860,13475,13112,12606,12612,12610,12608,12609,12609,12609,12609,12609],red:[15840,14685,14813,14273,13948,13508,12590,12591,12591,12590,12590,12589,12589,12589],bzp:null},
-{k:'600×1800 메쉬 스탠드없음',op:[12900,12700,12600,12400,12200,11900,11900,11600,11600,11600,11600,11300,11100,10900],biz:null,wow:[14850,13255,12760,12375,12012,11506,11512,11510,11508,11509,11509,11509,11509,11509],red:[13860,13695,13493,13283,13156,12716,11798,11799,11799,11798,11798,11798,11798,11798],bzp:null},
-{k:'B2 PET I형',op:[54500,53900,53300,52800,52800,51700,51700,50600,50600,50000,50000,49500,49500,49000],biz:[74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800],wow:null,red:null,bzp:null},
-{k:'B2 PET 스탠드없음',op:[7900,7800,7700,7600,7500,7300,7300,7100,7100,7100,7100,6900,6800,6700],biz:[11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500],wow:null,red:null,bzp:null},
-{k:'A1 PET I형',op:[57500,56900,56300,55700,55700,54600,54600,53400,53400,52800,52800,52300,52300,51700],biz:[74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800,74800],wow:null,red:null,bzp:null},
-{k:'A1 PET 스탠드없음',op:[9900,9800,9700,9600,9400,9200,9200,9000,9000,8900,8900,8700,8600,8400],biz:[11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500,11500],wow:null,red:null,bzp:null}
-],
-'양면 배너':[
-{k:'600×1800 PET 양면거치대',op:[39900,39000,39000,38600,38600,37800,37800,37000,37000,36600,36600,36200,36200,35800],biz:[43600,43600,43600,43600,43600,43600,43600,43600,43600,43600,43600,43600,43600,43600],wow:[36740,36520,36447,36300,36256,35926,35349,34782,33642,32951,32730,32686,32596,32350],red:[41580,41470,41287,41085,40942,40491,39578,39578,39574,39574,39574,39574,39574,39574],bzp:null},
-{k:'600×1800 PET 유리접착고무',op:[21500,21000,21000,20800,20800,20400,20400,19900,19900,19700,19700,19500,19500,19300],biz:null,wow:[19140,18920,18847,18700,18656,18458,17919,17380,16306,15745,15607,15579,15522,15407],red:[41800,40040,40113,39160,38654,36828,36823,36821,36819,36818,36818,36818,36818,36818],bzp:null},
-{k:'600×1800 메쉬 양면거치대',op:[44500,43500,43500,43100,43100,42200,42200,41200,41200,40800,40800,40400,40400,40000],biz:[70800,70800,70800,70800,70800,70800,70800,70800,70800,70800,70800,70800,70800,70800],wow:[48400,45210,44220,43450,42724,41580,41553,41521,41452,41324,41241,41225,41191,41060],red:[48950,48125,47887,47273,46992,45155,45155,45155,45155,45155,45155,45155,45155,45155],bzp:null},
-{k:'600×1800 메쉬 유리접착고무',op:[26500,25900,25900,25600,25600,25100,25100,24500,24500,24300,24300,24000,24000,23800],biz:null,wow:[30800,27610,26620,25850,25124,24112,24123,24119,24116,24116,24116,24116,24116,24116],red:[29370,27555,27647,26703,26224,24387,24387,24387,24387,24387,24387,24387,24387,24387],bzp:null}
-],
-'롤업 배너':[
-{k:'850×2000 PET',op:[99900,97900,97900,96900,96900,94900,94900,92900,92900,91900,91900,90900,90900,89900],biz:[129100,129100,129100,129100,129100,129100,129100,129100,129100,129100,129100,129100,129100,129100],wow:null,red:[77220,76890,76413,76395,75922,74734,74250,74250,74246,74246,74246,74246,74246,74246],bzp:null}
-],
-'미니 배너':[
-{k:'150×300 PET 거치대',op:[4900,4700,4700,4600,4600,4600,4600,4500,4500,4400,4400,4400,4400,4400],biz:[4900,3700,3400,3200,3100,2900,2600,2600,2600,2600,2600,2600,2600,2600],wow:[4290,4070,3557,3300,3124,2805,2409,2383,2200,2210,2144,2144,2144,2144],red:[8140,4675,4620,3768,3916,3267,3058,2790,2576,2404,2297,2240,2178,2124],bzp:null},
-{k:'150×300 PET 스탠드없음',op:[3900,3800,3800,3700,3700,3700,3700,3600,3600,3500,3500,3500,3500,3500],biz:null,wow:[2750,2530,2017,1760,1584,1265,924,898,814,824,824,824,824,824],red:[6930,3465,3410,2558,2706,2057,1848,1580,1366,1194,1087,1030,968,914],bzp:null},
-{k:'180×420 PET 거치대',op:[5500,5300,5300,5200,5200,5100,5100,5000,5000,5000,5000,4900,4900,4900],biz:[5500,3900,3900,3900,3800,3800,3500,3400,3300,3200,3200,3200,3200,3200],wow:[4840,4180,3703,3410,3278,3080,2998,2952,2750,2481,2417,2603,2604,2604],red:[8140,6325,5720,5390,5192,4906,4103,3832,3597,3384,3205,3120,3039,3039],bzp:null},
-{k:'180×420 PET 스탠드없음',op:[4500,4400,4400,4300,4300,4200,4200,4100,4100,4100,4100,4000,4000,4000],biz:null,wow:[3300,2640,2163,1870,1738,1540,1513,1467,1364,1095,1097,1283,1284,1284],red:[6930,5115,4510,4180,3982,3696,2893,2622,2387,2174,1995,1910,1829,1829],bzp:null}
-],
-'소프트명함':[
-{k:'90×50 직각 모서리',
- op:[3000,3800,4700,5600,11100,16500,20800,29300,44800,80400],
- biz:[null,null,7875,7400,14900,22350,28600,40400,56900,108300],
- wow:[null,null,null,3740,6710,null,12760,19800,27720,48510],
- red:[5830,7700,4700,4400,8250,12100,14740,18590,29370,53460],
- bzp:[null,7000,null,32000,61000,null,116000,165000,245000,400000]},
-{k:'90×50 둥근 모서리',
- op:[4000,5300,7200,9100,17300,25800,31600,45100,67600,115800],
- biz:[null,null,12000,10700,21500,32250,41800,60200,89900,174300],
- wow:[null,null,null,7040,13310,null,25960,39600,60720,114510],
- red:[6600,8910,7200,7590,14300,21010,26510,35970,55550,103950],
- bzp:[null,9000,null,38000,72000,null,137000,196000,296000,501000]}
-]
-};
+const tb=document.getElementById('tableBody');
+D.forEach(r=>{const ev=r.ev==='-'?'<span style="color:var(--text3)">-</span>':r.ev==='1차'?'<span class="badge badge-coral">1차</span>':'<span class="badge badge-teal">2차</span>';const nm=(r.isNew?'<span class="badge badge-new">NEW</span> ':'')+`<span class="product-name">${r.name}</span>`;const sd=r.so?fmt(r.stock):r.sold>0?fmt(r.sold):'<span style="color:var(--text3)">-</span>';const rm=r.so?'<span style="font-weight:600">0</span>':fmt(r.remain);const p=r.isNew?null:Math.round(r.sellThru);const bc=p===null?'':p>=60?'var(--teal)':p>=30?'var(--amber)':'var(--red)';const bh=p===null?'<span style="color:var(--text3)">-</span>':`<div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${Math.min(p,100)}%;background:${bc}"></div></div><div class="bar-label" style="color:${bc}">${p}%</div></div>`;const rv=r.rev>0?fmtWon(r.rev):'<span style="color:var(--text3)">-</span>';const nt=r.so?'<span class="badge badge-soldout">sold out</span>':r.isNew?'<span style="color:var(--text3);font-size:0.68rem">신규 예정</span>':'';tb.innerHTML+=`<tr class="${r.so?'soldout':''}"><td class="c" style="color:var(--text3)">${r.n}</td><td>${nm}</td><td class="c">${ev}</td><td class="r">${fmt(r.stock)}</td><td class="r">${sd}</td><td class="r">${rm}</td><td>${bh}</td><td class="r">${rv}</td><td class="c">${nt}</td></tr>`;});
+document.getElementById('tableFoot').innerHTML=`<tr><td colspan="3" style="font-weight:600">Total</td><td class="r">${fmt(tS)}</td><td class="r">${fmt(tSo)}</td><td class="r">${fmt(tR)}</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(tSo/tS*100)}%;background:var(--amber)"></div></div><div class="bar-label" style="color:var(--amber)">${Math.round(tSo/tS*100)}%</div></div></td><td class="r">${fmtWon(tRv)}</td><td></td></tr>`;
 
-const W=n=>'₩'+Math.round(n).toLocaleString();
+const wks=['3/16','3/23','3/30','4/6','4/13'];
+const wkly={'30수 오버핏':{ev:'1차',d:[6783,3812,14,15,7]},'20수 티(남)':{ev:'2차',d:[2544,4225,18,11,0]},'20수 오버핏':{ev:'1차',d:[4191,638,0,0,0]},'20수 티(여)':{ev:'2차',d:[2129,2598,34,36,11]},'30수 티셔츠':{ev:'-',d:[209,485,168,132,19]},'세미크롭':{ev:'2차',d:[81,195,11,17,2]},'쭈리 맨투맨':{ev:'-',d:[49,93,26,108,0]},'16수 릴렉스':{ev:'-',d:[27,99,46,61,36]},'헤비쭈리 후드':{ev:'-',d:[29,16,27,6,23]},'30수 세미크롭':{ev:'-',d:[2,14,12,10,6]},'원피스':{ev:'-',d:[1,3,2,1,0]}};
+const wK=Object.keys(wkly),pal=[['#d85a30','#f0997b'],['#1d9e75','#5dcaa5'],['#993c1d','#f5c4b3'],['#0f6e56','#9fe1cb'],['#378add','#85b7eb'],['#d4537e','#ed93b1'],['#534ab7','#afa9ec'],['#ba7517','#fac775'],['#639922','#97c459'],['#5f5e5a','#b4b2a9'],['#854f0b','#ef9f27']],pc=i=>isDk?pal[i][1]:pal[i][0];
 
-let prod='현수막', oI=0, qI=0, lc=null, bc=null;
-let vols={};
-let excl=new Set();
-let manualRate=null;
+const trC=new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:wks,datasets:wK.map((k,i)=>({label:k,data:wkly[k].d,borderColor:pc(i),backgroundColor:pc(i)+'22',borderWidth:2,pointRadius:3,tension:.3}))},options:{...bOpts({legend:{display:false},tooltip:{mode:'index',intersect:false}}),interaction:{mode:'index',intersect:false}}});
+document.getElementById('stackLegend').innerHTML=wK.map((k,i)=>`<span><span class="swatch" style="background:${pc(i)}"></span>${k}</span>`).join('');
+new Chart(document.getElementById('stackChart'),{type:'bar',data:{labels:wks,datasets:wK.map((k,i)=>({label:k,data:wkly[k].d,backgroundColor:pc(i)+'bb',borderColor:pc(i),borderWidth:1}))},options:{...bOpts({legend:{display:false},tooltip:{mode:'index'}}),scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:kF}}}}});
+document.querySelectorAll('#trendFilters button').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('#trendFilters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.f;trC.data.datasets.forEach((ds,i)=>{ds.hidden=f==='all'?false:f==='event'?wkly[wK[i]].ev==='-':wkly[wK[i]].ev!=='-';});trC.update();});});
+const ex=D.filter(r=>!r.isNew&&!r.so);
+new Chart(document.getElementById('invChart'),{type:'bar',data:{labels:ex.map(r=>r.name.replace('팀블링 ','')),datasets:[{label:'판매',data:ex.map(r=>r.sold),backgroundColor:teal,borderRadius:4,barPercentage:.65},{label:'잔여',data:ex.map(r=>r.remain),backgroundColor:isDk?'rgba(180,178,169,0.3)':'rgba(136,135,128,0.2)',borderRadius:4,barPercentage:.65}]},options:{indexAxis:'y',...bOpts({legend:{display:false}}),scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:kF}},y:{stacked:true,grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+const pD=D.filter(r=>r.rev>0).sort((a,b)=>b.rev-a.rev);
+new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:pD.map(r=>r.name.replace('팀블링 ','')),datasets:[{data:pD.map(r=>r.rev),backgroundColor:pD.map((_,i)=>pc(i%pal.length)+'cc'),borderColor:isDk?'#1e1e1c':'#fff',borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:tc,font:{size:11},padding:8,usePointStyle:true,pointStyleWidth:10}},tooltip:{callbacks:{label:c=>{const v=c.raw,p=Math.round(v/tRv*100);return c.label+': '+fmtWon(v)+' ('+p+'%)'}}}}}});
 
-const gO=()=>D[prod][oI]||D[prod][0];
-const gV=i=>{const k=prod+'_'+i;return vols[k]??100};
-const sV=(i,v)=>{vols[prod+'_'+i]=+v||0};
+/* TAB SWITCH */
+let aI=false,sI=false;
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById('tab-'+t.dataset.tab).classList.add('active');if(t.dataset.tab==='analysis'&&!aI){initA();aI=true;}if(t.dataset.tab==='strategy'&&!sI){initS();sI=true;}}));
 
-function populateQtySelects(){
-  const qs=gQS();
-  ['qsel','iqsel'].forEach(id=>{
-    const s=document.getElementById(id);
-    s.innerHTML='';
-    qs.forEach((q,i)=>{const o=document.createElement('option');o.value=i;o.textContent=q+'개';s.appendChild(o);});
-    s.value=0;
-  });
+/* TAB 2 INIT */
+function initA(){
+  const w=['2/2','2/9','2/16','2/23','3/2','3/9','3/16','3/23','3/30','4/6','4/13'];
+  const tQ=[826,845,629,893,890,1312,17226,13633,1457,2170,684],cQ=[0,0,0,0,0,0,16045,12178,358,397,104],nQ=tQ.map((t,i)=>t-cQ[i]),cP=tQ.map((t,i)=>t>0?Math.round(cQ[i]/t*100):0);
+  const bN=[826,845,629,893,890,1312,1181,1455,1099,1773,580];
+  document.getElementById('aMetrics').innerHTML=[{l:'이벤트 전 주간 평균',v:'899',s:'어패럴 2/2~3/9'},{l:'이벤트 피크',v:'17,226',s:'3/16 주차'},{l:'이벤트 후 평균',v:'1,437',s:'3/30~4/13 비클리어런스'},{l:'YoY 성장률',v:'+15%',s:'비클리어런스 기준'}].map(m=>`<div class="metric"><div class="metric-label">${m.l}</div><div class="metric-value">${m.v}</div><div class="metric-sub">${m.s}</div></div>`).join('');
+  new Chart(document.getElementById('a1'),{type:'bar',data:{labels:w,datasets:[{label:'비클리어런스',data:nQ,backgroundColor:blue+'99',borderColor:blue,borderWidth:1,stack:'s'},{label:'클리어런스',data:cQ,backgroundColor:coral+'99',borderColor:coral,borderWidth:1,stack:'s'}]},options:{...bOpts({tooltip:{mode:'index'}}),scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:10},callback:kF}}}}});
+  new Chart(document.getElementById('a2'),{type:'line',data:{labels:w,datasets:[{label:'클리어런스 비중 %',data:cP,borderColor:coral,backgroundColor:coral+'22',fill:true,borderWidth:2,pointRadius:4,tension:.3},{label:'비클리어런스 수량',data:nQ,borderColor:blue,borderWidth:2,pointRadius:3,tension:.3,yAxisID:'y1'}]},options:{...bOpts(),scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:{position:'left',grid:{color:gc},ticks:{color:tc,font:{size:10},callback:v=>v+'%'},max:100},y1:{position:'right',grid:{display:false},ticks:{color:tc,font:{size:10},callback:kF}}}}});
+  const sI=[1299,1098,1548,1077,944,1061,1063,1543],a25=Math.round(sI.reduce((a,b)=>a+b,0)/sI.length),sM=sI.map(v=>v/a25);
+  const rB=bN.slice(-4),aB=Math.round(rB.reduce((a,b)=>a+b,0)/rB.length);
+  const fW=['4/20','4/27','5/4','5/11','5/18','5/25','6/1','6/8'],fB=sM.map(m=>Math.round(aB*m*1.15)),cWA=Math.round((358+397+104)/3),fC=fB.map((_,i)=>Math.round(cWA*(i<4?.9:.7))),fT=fB.map((b,i)=>b+fC[i]);
+  const allW=[...w,...fW],aT=[...tQ,...Array(8).fill(null)],aC=[...cQ,...Array(8).fill(null)],fTl=[...Array(10).fill(null),tQ[10],...fT],fCl=[...Array(10).fill(null),cQ[10],...fC];
+  new Chart(document.getElementById('a3'),{type:'line',data:{labels:allW,datasets:[{label:'전체 (실적)',data:aT,borderColor:blue,borderWidth:2,pointRadius:3,tension:.3},{label:'전체 (예측)',data:fTl,borderColor:blue,borderWidth:2,borderDash:[6,4],pointRadius:3,tension:.3},{label:'클리어런스 (실적)',data:aC,borderColor:coral,borderWidth:2,pointRadius:3,tension:.3},{label:'클리어런스 (예측)',data:fCl,borderColor:coral,borderWidth:2,borderDash:[6,4],pointRadius:3,tension:.3}]},options:{...bOpts({tooltip:{mode:'index',intersect:false}}),interaction:{mode:'index',intersect:false},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9},maxRotation:45}},y:{grid:{color:gc},ticks:{color:tc,font:{size:10},callback:kF}}}}});
+  const q25=[371,918,666,560,504,432,607,738,703,1299,1098];
+  new Chart(document.getElementById('a4'),{type:'line',data:{labels:['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11'],datasets:[{label:'2025 어패럴',data:q25,borderColor:gray,borderWidth:2,pointRadius:3,tension:.3},{label:'2026 전체',data:tQ,borderColor:blue,borderWidth:2,pointRadius:3,tension:.3},{label:'2026 비클리어런스',data:bN,borderColor:teal,borderWidth:2,borderDash:[4,3],pointRadius:3,tension:.3}]},options:bOpts()});
 }
 
-function init(){
-  const pn=document.getElementById('pnav');
-  Object.keys(D).forEach(p=>{
-    const b=document.createElement('button');
-    b.className='pn'+(p===prod?' on':'');
-    b.textContent=p; b.onclick=()=>sP(p); pn.appendChild(b);
-  });
-  populateQtySelects();
-  iCharts(); uOsel(); uAll(); uIhead();
+/* TAB 3 INIT */
+function initS(){
+  const mo=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan\'27'];
+  const rem=42256;
+  const sA=mo.map((_,i)=>Math.max(0,rem-Math.round(280*4*(i+1))));
+  const eM=[1,3,5];let rB=rem;const sB=mo.map((_,i)=>{if(eM.includes(i))rB=Math.max(0,rB-14000);else rB=Math.max(0,rB-280*4);return rB;});
+  let rC=rem;const sC=mo.map((_,i)=>{rC=Math.max(0,rC-Math.round(500*4*(1+i*0.05)));return rC;});
+  new Chart(document.getElementById('s1'),{type:'line',data:{labels:mo,datasets:[{label:'A: 현행 유지',data:sA,borderColor:gray,borderWidth:2,pointRadius:3,tension:.3},{label:'B: 이벤트 집중 (추천)',data:sB,borderColor:teal,borderWidth:2,pointRadius:4,tension:.3},{label:'C: 할인 확대',data:sC,borderColor:amber,borderWidth:2,borderDash:[5,3],pointRadius:3,tension:.3}]},options:{...bOpts({tooltip:{mode:'index',intersect:false}}),interaction:{mode:'index',intersect:false},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:10},callback:kF}}}}});
+  new Chart(document.getElementById('s2'),{type:'bar',data:{labels:['시나리오 A\n현행 유지','시나리오 B\n이벤트 집중','시나리오 C\n할인 확대'],datasets:[{label:'연간 예상 소진량',data:[14560,47000,26000],backgroundColor:[gray+'99',teal+'99',amber+'99'],borderColor:[gray,teal,amber],borderWidth:2,borderRadius:6,barPercentage:.5}]},options:{...bOpts({legend:{display:false}}),scales:{x:{grid:{display:false},ticks:{color:tc,font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:10},callback:kF}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)+'개 / 연'}}}}});
 }
-
-function sP(p){
-  prod=p; oI=0; qI=0; manualRate=null;
-  document.querySelectorAll('.pn').forEach((b,i)=>{b.className='pn'+(Object.keys(D)[i]===p?' on':'');});
-  populateQtySelects();
-  uOsel(); uAll(); uIhead(); uI();
-  if(document.getElementById('vd2').style.display!=='none') uRec();
-}
-function sO(v){oI=v; uAll();}
-function sQ(v){qI=v; uBar(); uDiff(); uS();}
-function sv(n){
-  [0,1,2].forEach(i=>{
-    document.getElementById('vd'+i).style.display=i===n?'':'none';
-    document.getElementById('vt'+i).className='vt'+(i===n?' on':'');
-  });
-  document.getElementById('optbar').style.display=n===0?'':'none';
-  if(n===1) uI();
-  if(n===2) uRec();
-}
-function sAV(n){D[prod].forEach((_,i)=>sV(i,n)); uI();}
-function applyAll(){const v=+document.getElementById('qall').value; if(!isNaN(v)&&v>=0){sAV(v); document.getElementById('qall').value='';}}
-function uOsel(){
-  const s=document.getElementById('osel'); s.innerHTML='';
-  D[prod].forEach((o,i)=>{const x=document.createElement('option');x.value=i;x.textContent=o.k;s.appendChild(x);});
-}
-
-function iCharts(){
-  lc=new Chart(document.getElementById('lc'),{
-    type:'line',
-    data:{labels:gQS().map(q=>''+q),datasets:[]},
-    options:{responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y!=null?`${c.dataset.label}: ${W(c.parsed.y)}`:`${c.dataset.label}: -`}}},
-      scales:{x:{ticks:{font:{size:10},maxRotation:0},grid:{display:false}},
-              y:{ticks:{callback:v=>`${Math.round(v/1000)}K`,font:{size:10}},beginAtZero:false,grid:{color:'rgba(0,0,0,.05)'}}}}
-  });
-  bc=new Chart(document.getElementById('bc'),{
-    type:'bar',
-    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>W(c.parsed.y)}}},
-      scales:{x:{ticks:{font:{size:11}},grid:{display:false}},y:{ticks:{callback:v=>`${Math.round(v/1000)}K`,font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}}
-  });
-}
-
-function uAll(){uLeg();uLine();uBar();uDiff();uS();}
-function uLeg(){
-  const o=gO(),qs=gQS();
-  document.getElementById('leg').innerHTML=CK.map((k,i)=>{
-    if(!o[k])return'';
-    const arr=o[k]; const p=Array.isArray(arr)?arr[qI]:null;
-    return`<span class="tag" style="background:${CB[i]};color:${CC[i]}"><span class="tag-dot" style="background:${CC[i]}"></span>${CN[i]}<span style="margin-left:4px;opacity:.7;font-weight:400">${p?W(p):'-'}</span></span>`;
-  }).join('');
-}
-function uLine(rate){
-  const o=gO(),qs=gQS();
-  const r=rate!=null?rate:+document.getElementById('rsl').value;
-  lc.data.labels=qs.map(q=>''+q);
-  const base=CK.map((k,i)=>{
-    if(!o[k])return null;
-    return{label:CN[i],data:o[k],borderColor:CC[i],backgroundColor:'transparent',
-      borderWidth:k==='op'?3:1.8,pointRadius:0,tension:0.25,spanGaps:true,
-      borderDash:k==='op'?[]:[4,3]};
-  }).filter(Boolean);
-  if(r>0){
-    const adjusted=o.op.map(v=>v!=null?Math.round(v*(1+r/100)):null);
-    base.push({
-      label:`오프린트미 +${r}% 적용`,
-      data:adjusted,
-      borderColor:'#ffca4f',
-      backgroundColor:'rgba(255,202,79,0.12)',
-      borderWidth:2.5,
-      pointRadius:0,
-      tension:0.25,
-      spanGaps:true,
-      borderDash:[6,3],
-      fill:false,
-      order:-1
-    });
-  }
-  lc.data.datasets=base;
-  lc.update('none');
-}
-function uBar(){
-  const o=gO(),lb=[],vl=[],cl=[];
-  CK.forEach((k,i)=>{
-    if(!o[k])return;
-    const v=Array.isArray(o[k])?o[k][qI]:null;
-    if(!v)return; lb.push(CN[i]); vl.push(v); cl.push(CC[i]);
-  });
-  bc.data.labels=lb; bc.data.datasets[0].data=vl; bc.data.datasets[0].backgroundColor=cl; bc.update();
-}
-function uDiff(){
-  const o=gO(),op=o.op[qI];
-  document.getElementById('diff').innerHTML=CK.slice(1).map((k,i)=>{
-    if(!o[k])return'';
-    const cp=Array.isArray(o[k])?o[k][qI]:null; if(!cp)return'';
-    const d=op-cp,pos=d<=0;
-    return`<div class="cmp-row"><span style="color:var(--color-text-secondary)">${CN[i+1]} <span style="color:var(--color-text-primary)">${W(cp)}</span></span><span style="font-weight:500;color:${pos?'#27500A':'#A32D2D'}">${pos?`우리 ${W(Math.abs(d))} 저렴`:`${CN[i+1]} ${W(Math.abs(d))} 저렴`}</span></div>`;
-  }).join('');
-}
-function uS(){
-  const o=gO(),op=o.op[qI];
-  const r=+document.getElementById('rsl').value,vol=+document.getElementById('vinp').value||1;
-  document.getElementById('rdisp').textContent=r+'%';
-  const np=Math.round(op*(1+r/100)),cR=op*vol,nR=np*vol,d=nR-cR;
-  document.getElementById('smets').innerHTML=
-    `<div class="stat"><div class="stat-l">현재 단가</div><div class="stat-v">${W(op)}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 단가</div><div class="stat-v blu">${W(np)}</div></div>`+
-    `<div class="stat"><div class="stat-l">현재 월매출</div><div class="stat-v">${W(cR)}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 월매출</div><div class="stat-v blu">${W(nR)}</div></div>`;
-  const cls=d>0?'pos':d<0?'neg':'neu';
-  document.getElementById('sbadge').innerHTML=`<div class="badge ${cls}">월 매출 변화 ${d>=0?'+':''}${W(d)} (${r}% 인상 시)</div>`;
-  document.getElementById('scmp').innerHTML=r>0?CK.slice(1).map((k,i)=>{
-    if(!o[k])return'';
-    const cp=Array.isArray(o[k])?o[k][qI]:null; if(!cp)return'';
-    const nd=np-cp,pos=nd<=0;
-    return`<div class="cmp-row"><span style="color:var(--color-text-secondary)">${CN[i+1]}</span><span style="font-weight:500;color:${pos?'#27500A':'#A32D2D'}">${pos?`여전히 ${W(Math.abs(nd))} 저렴`:`${W(Math.abs(nd))} 비쌈`}</span></div>`;
-  }).join(''):'';
-  uLine(r);
-}
-
-function uIhead(){
-  document.getElementById('ith').innerHTML=`<tr>
-    <th style="text-align:left">옵션</th><th>현재 단가</th><th>인상 후 단가</th>
-    <th>월 판매 수량</th><th>현재 월매출</th><th>인상 후 월매출</th><th>증감</th>
-  </tr>`;
-}
-function uI(){
-  const r=+document.getElementById('irl').value,qi=+document.getElementById('iqsel').value;
-  document.getElementById('irdisp').textContent=r+'%';
-  let rows='',tc=0,tn=0;
-  D[prod].forEach((o,i)=>{
-    const p=o.op[qi],vol=gV(i),np=Math.round(p*(1+r/100)),cR=p*vol,nR=np*vol,d=nR-cR;
-    tc+=cR; tn+=nR;
-    const dc=d>0?'#27500A':d<0?'#A32D2D':'var(--color-text-secondary)';
-    rows+=`<tr><td title="${o.k}">${o.k}</td><td>${W(p)}</td><td style="color:#185FA5">${W(np)}</td>
-      <td><input class="vi" type="number" min="0" value="${vol}" oninput="sV(${i},this.value);uIsum()"></td>
-      <td>${W(cR)}</td><td style="color:#185FA5">${W(nR)}</td>
-      <td style="color:${dc};font-weight:500">${d>=0?'+':''}${W(d)}</td></tr>`;
-  });
-  document.getElementById('itb').innerHTML=rows;
-  const td=tn-tc,tp=tc>0?(td/tc*100):0;
-  document.getElementById('itf').innerHTML=`<tr><td>합계 (${D[prod].length}개 옵션)</td><td></td><td></td><td></td>
-    <td>${W(tc)}</td><td style="color:#185FA5">${W(tn)}</td>
-    <td style="color:${td>=0?'#27500A':'#A32D2D'};font-weight:500">${td>=0?'+':''}${W(td)}</td></tr>`;
-  const cls=td>0?'pos':td<0?'neg':'neu';
-  document.getElementById('isum').innerHTML=
-    `<div class="stat"><div class="stat-l">현재 총 월매출</div><div class="stat-v">${W(tc)}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 총 월매출</div><div class="stat-v blu">${W(tn)}</div></div>`+
-    `<div class="stat"><div class="stat-l">총 증감액</div><div class="stat-v ${cls}">${td>=0?'+':''}${W(td)}<span style="font-size:11px;font-weight:400;margin-left:4px">(${tp>=0?'+':''}${tp.toFixed(1)}%)</span></div></div>`;
-}
-function uIsum(){
-  const r=+document.getElementById('irl').value,qi=+document.getElementById('iqsel').value;
-  let tc=0,tn=0;
-  D[prod].forEach((o,i)=>{const p=o.op[qi],vol=gV(i),np=Math.round(p*(1+r/100));tc+=p*vol;tn+=np*vol;});
-  const td=tn-tc,tp=tc>0?(td/tc*100):0,cls=td>0?'pos':td<0?'neg':'neu';
-  document.getElementById('isum').innerHTML=
-    `<div class="stat"><div class="stat-l">현재 총 월매출</div><div class="stat-v">${W(tc)}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 총 월매출</div><div class="stat-v blu">${W(tn)}</div></div>`+
-    `<div class="stat"><div class="stat-l">총 증감액</div><div class="stat-v ${cls}">${td>=0?'+':''}${W(td)}<span style="font-size:11px;font-weight:400;margin-left:4px">(${tp>=0?'+':''}${tp.toFixed(1)}%)</span></div></div>`;
-}
-
-function initExclBtns(){
-  const el=document.getElementById('excl-btns'); if(!el)return;
-  el.innerHTML=CK.slice(1).map((k,i)=>{
-    const on=!excl.has(k);
-    return`<button class="excl-btn" onclick="togExcl('${k}')" style="border:1px solid ${on?CC[i+1]:'var(--color-border-secondary)'};background:${on?CB[i+1]:'var(--color-background-secondary)'};color:${on?CC[i+1]:'var(--color-text-secondary)'}">${on?'✓ ':'✕ '}${CN[i+1]}</button>`;
-  }).join('');
-}
-function togExcl(k){ if(excl.has(k))excl.delete(k); else excl.add(k); initExclBtns(); uRec();}
-
-function calcRec(){
-  const qi=0;
-  const opts=D[prod];
-  const activeCK=CK.slice(1).filter(k=>!excl.has(k));
-  let totalGap=0,totalOpts=0,cheapCount=0,expCount=0,midCount=0;
-  const rows=[];
-  opts.forEach(o=>{
-    const us=o.op[qi];
-    const cpx=activeCK.map(k=>{
-      if(!o[k])return null;
-      return Array.isArray(o[k])?o[k][qi]:o[k];
-    }).filter(v=>v&&v>0);
-    if(!cpx.length){rows.push({k:o.k,us,mn:null,avg:null,mx:null,pct:null,rec:0});return;}
-    const mn=Math.min(...cpx),mx=Math.max(...cpx),avg=cpx.reduce((a,b)=>a+b,0)/cpx.length;
-    const pct=us/avg;
-    let rec=0;
-    if(pct<0.80){rec=Math.round((avg*0.88-us)/us*100);cheapCount++;}
-    else if(pct<0.90){rec=Math.round((avg*0.93-us)/us*100);cheapCount++;}
-    else if(pct<0.98){rec=Math.round((avg*0.97-us)/us*100);midCount++;}
-    else if(pct<1.05){rec=0;midCount++;}
-    else{rec=Math.round((avg*1.0-us)/us*100);expCount++;}
-    totalGap+=pct; totalOpts++;
-    rows.push({k:o.k,us,mn,avg:Math.round(avg),mx,pct,rec:Math.max(-30,Math.min(50,rec))});
-  });
-  const avgPct=totalOpts>0?totalGap/totalOpts:1;
-  const overallRec=avgPct<0.85?Math.round((0.90-avgPct)*100):avgPct<0.93?Math.round((0.95-avgPct)*100):avgPct<1.02?0:Math.round((1.0-avgPct)*100);
-  return{rows,overallRec:Math.max(-20,Math.min(40,overallRec)),avgPct,cheapCount,midCount,expCount,totalOpts};
-}
-
-function setRecRate(v){
-  const {overallRec}=calcRec();
-  const rate=v===null?overallRec:v;
-  manualRate=rate;
-  document.getElementById('rrl').value=rate;
-  document.getElementById('rrdisp').textContent=rate+'%';
-  uRecRatePanel(rate);
-}
-function uRecRate(){
-  const r=+document.getElementById('rrl').value;
-  manualRate=r;
-  document.getElementById('rrdisp').textContent=r+'%';
-  uRecRatePanel(r);
-}
-function uRecRatePanel(r){
-  const simVol=500;
-  const curTotal=D[prod].reduce((s,o)=>s+o.op[0]*simVol,0);
-  const newTotal=Math.round(curTotal*(1+r/100));
-  const d=newTotal-curTotal;
-  const activeCK=CK.slice(1).filter(k=>!excl.has(k));
-  document.getElementById('rmets').innerHTML=
-    `<div class="stat"><div class="stat-l">현재 단가 합계</div><div class="stat-v">${W(D[prod].reduce((s,o)=>s+o.op[0],0))}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 단가 합계</div><div class="stat-v blu">${W(D[prod].reduce((s,o)=>s+Math.round(o.op[0]*(1+r/100)),0))}</div></div>`+
-    `<div class="stat"><div class="stat-l">현재 예상 월매출</div><div class="stat-v">${W(curTotal)}</div></div>`+
-    `<div class="stat"><div class="stat-l">인상 후 예상 월매출</div><div class="stat-v blu">${W(newTotal)}</div></div>`;
-  const cls=d>0?'pos':d<0?'neg':'neu';
-  document.getElementById('rbadge').innerHTML=`<div class="badge ${cls}">월 매출 변화 ${d>=0?'+':''}${W(d)} (${r}% 인상 시 · 옵션당 ${simVol}개 기준)</div>`;
-  let cmp='';
-  if(r!==0){
-    D[prod].forEach(o=>{
-      const np=Math.round(o.op[0]*(1+r/100));
-      const cpx=activeCK.map(k=>{
-        if(!o[k])return null;
-        return Array.isArray(o[k])?o[k][0]:o[k];
-      }).filter(v=>v&&v>0);
-      if(!cpx.length)return;
-      const avg=Math.round(cpx.reduce((a,b)=>a+b,0)/cpx.length);
-      const nd=np-avg,pos=nd<=0;
-      cmp+=`<div class="cmp-row"><span style="color:var(--color-text-secondary)">${o.k}</span><span style="color:${pos?'#27500A':'#A32D2D'};font-weight:500">${pos?`시장 평균 대비 ${W(Math.abs(nd))} 저렴`:`시장 평균 대비 ${W(Math.abs(nd))} 비쌈`}</span></div>`;
-    });
-  }
-  document.getElementById('rcmp').innerHTML=cmp;
-}
-
-function uRec(){
-  const {rows,overallRec,avgPct,cheapCount,midCount,expCount,totalOpts}=calcRec();
-  initExclBtns();
-  const exclNote=excl.size>0?` (${[...excl].map(k=>CN[CK.indexOf(k)]).join(', ')} 제외)`:'';
-  const qs=gQS();
-  const pctStr=Math.round((avgPct-1)*100);
-  const posLabel=avgPct<0.85?'대폭 저평가':avgPct<0.93?'저평가':avgPct<1.02?'적정 수준':avgPct<1.1?'소폭 고가':'고가 포지션';
-  const heroColor=overallRec>5?'linear-gradient(135deg,#0c447c,#185FA5)':overallRec>0?'linear-gradient(135deg,#18181b,#444)':overallRec<-5?'linear-gradient(135deg,#791F1F,#A32D2D)':'linear-gradient(135deg,#27500A,#3B6D11)';
-  document.getElementById('rhero').style.background=heroColor;
-  document.getElementById('rhero').innerHTML=
-    `<div style="font-size:11px;letter-spacing:.08em;opacity:.6;margin-bottom:8px">추천 판매가 분석 · ${prod}${exclNote}</div>`+
-    `<div style="font-size:28px;font-weight:500;letter-spacing:-.04em;margin-bottom:6px">${overallRec>0?'+':''}${overallRec}% ${overallRec>0?'인상':'인하'} 권장</div>`+
-    `<div style="font-size:13px;opacity:.7">현재 시장 대비 ${posLabel} · 전체 ${totalOpts}개 옵션 기준 (${qs[0]}개 수량)</div>`;
-
-  const rate=manualRate!==null?manualRate:overallRec;
-  document.getElementById('rrl').value=rate;
-  document.getElementById('rrdisp').textContent=rate+'%';
-  uRecRatePanel(rate);
-
-  const diagItems=[
-    {icon:'📊',label:'시장 대비 평균 포지션',val:`${pctStr>=0?'+':''}${pctStr}%`,color:pctStr<-10?'#FAEEDA':pctStr>10?'#FCEBEB':'#EAF3DE',tcolor:pctStr<-10?'#633806':pctStr>10?'#501313':'#173404'},
-    {icon:'⬇',label:'저평가 옵션 수',val:`${cheapCount}개`,color:'#FAEEDA',tcolor:'#633806'},
-    {icon:'✓',label:'적정가 옵션 수',val:`${midCount}개`,color:'#EAF3DE',tcolor:'#173404'},
-    {icon:'⬆',label:'고가 옵션 수',val:`${expCount}개`,color:'#FCEBEB',tcolor:'#501313'},
-  ];
-  document.getElementById('rdiag').innerHTML=diagItems.map(d=>
-    `<div class="insight-item"><div class="insight-icon" style="background:${d.color};color:${d.tcolor}">${d.icon}</div><div><div style="font-size:12px;font-weight:500;margin-bottom:2px">${d.label}</div><div style="font-size:16px;font-weight:500;color:${d.tcolor}">${d.val}</div></div></div>`
-  ).join('');
-
-  const reasons=[];
-  if(cheapCount>totalOpts*0.5)reasons.push({t:'가격 경쟁력 과다',d:`전체 옵션의 ${Math.round(cheapCount/totalOpts*100)}%가 시장 평균 대비 7% 이상 저렴합니다. 브랜드 가치 대비 저평가되어 있을 가능성이 있습니다.`});
-  if(avgPct<0.88)reasons.push({t:'인상 여력 존재',d:`현재 가격은 경쟁사 평균 대비 ${Math.round((1-avgPct)*100)}% 낮은 수준입니다. ${overallRec}% 인상 후에도 시장 내 경쟁력을 유지할 수 있습니다.`});
-  if(avgPct>=0.93&&avgPct<=1.05)reasons.push({t:'최적 포지션 유지',d:'현재 가격이 시장 평균 대비 ±5% 내에 위치하여 경쟁력과 수익성의 균형이 잡혀 있습니다.'});
-  if(expCount>totalOpts*0.3)reasons.push({t:'일부 옵션 가격 조정 필요',d:`${expCount}개 옵션이 경쟁사 평균을 초과합니다. 선택적 인하 또는 차별화 포인트 강화가 필요합니다.`});
-  if(!reasons.length)reasons.push({t:'현행 가격 유지 권장',d:'경쟁사 대비 현재 포지션이 안정적입니다. 큰 변화보다 세부 옵션별 미세 조정을 권장합니다.'});
-  document.getElementById('rreason').innerHTML=reasons.map(r=>
-    `<div class="insight-item"><div><div style="font-size:12px;font-weight:500;margin-bottom:3px">${r.t}</div><div style="font-size:11px;color:var(--color-text-secondary);line-height:1.6">${r.d}</div></div></div>`
-  ).join('');
-
-  const simVol=500;
-  const curTotal=D[prod].reduce((s,o)=>s+o.op[0]*simVol,0);
-  const newTotal=Math.round(curTotal*(1+overallRec/100));
-  const diffTotal=newTotal-curTotal;
-  const cls2=diffTotal>0?'grn':diffTotal<0?'red':'';
-  document.getElementById('reffect').innerHTML=
-    `<div class="stat"><div class="stat-l">현재 예상 월매출 (옵션당 500개)</div><div class="stat-v">${W(curTotal)}</div></div>`+
-    `<div class="stat"><div class="stat-l">추천 인상률 적용 후</div><div class="stat-v blu">${W(newTotal)}</div></div>`+
-    `<div class="stat"><div class="stat-l">월 매출 증감</div><div class="stat-v ${cls2}">${diffTotal>=0?'+':''}${W(diffTotal)}</div></div>`;
-
-  document.getElementById('rpos').innerHTML=rows.map(r=>{
-    if(!r.avg)return`<tr><td title="${r.k}">${r.k}</td><td>${W(r.us)}</td><td colspan="3" style="color:var(--color-text-secondary);text-align:center">경쟁사 데이터 없음</td><td>-</td><td>-</td></tr>`;
-    const p=r.pct,pos=p<0.88?'저평가':p<0.98?'적정':p<1.08?'소폭고가':'고가';
-    const posColor=p<0.88?'#633806':p<0.98?'#173404':p<1.08?'#185FA5':'#501313';
-    const posBg=p<0.88?'#FAEEDA':p<0.98?'#EAF3DE':p<1.08?'#E6F1FB':'#FCEBEB';
-    const pctFill=Math.min(100,Math.round(p*50));
-    return`<tr>
-      <td title="${r.k}">${r.k}</td>
-      <td style="font-weight:500">${W(r.us)}</td>
-      <td>${W(r.mn)}</td>
-      <td><div style="display:flex;align-items:center;gap:6px"><div class="pos-bar" style="width:60px;flex-shrink:0"><div class="pos-fill" style="width:${pctFill}%"></div></div>${W(r.avg)}</div></td>
-      <td>${W(r.mx)}</td>
-      <td><span class="rank-pill" style="background:${posBg};color:${posColor}">${pos}</span></td>
-      <td style="font-weight:500;color:${r.rec>0?'#27500A':r.rec<0?'#A32D2D':'var(--color-text-secondary)'}">${r.rec>0?'+':''}${r.rec}%</td>
-    </tr>`;
-  }).join('');
-}
-
-window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
